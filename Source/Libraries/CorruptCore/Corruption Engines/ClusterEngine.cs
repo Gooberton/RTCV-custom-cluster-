@@ -177,25 +177,33 @@ namespace RTCV.CorruptCore
 
             void Interleave(List<byte[]> list)
             {
-                int half = list.Count / 2; 
-                List<byte[]> interleaved = new List<byte[]>(list.Count); 
+                int count = list.Count;
+                if (count <= 1)
+                    return;
 
-                for (int i = 0; i < half; i++) // iterate over the first half then the second half of the list then adds the elements to the interleaved list
-                {  
+                int half = (count + 1) / 2; // first half is larger when odd
+
+                var interleaved = new List<byte[]>(count);
+
+
+                int i = 0;
+                int j = half;
+
+                while (i < half && j < count)
+                {
+                    interleaved.Add(list[i++]);
+                    interleaved.Add(list[j++]);
+                }
+
+                // If there's a middle element left (odd count), add it
+                if (i < half)
                     interleaved.Add(list[i]);
-                    interleaved.Add(list[half + i]);
-                }
 
-                if (list.Count % 2 != 0) // if the list has an odd number of elements then add the last element
-                {
-                    interleaved.Add(list[list.Count - 1]); 
-                }
 
-                for (int i = 0; i < list.Count; i++) // copy the interleaved list back to the original list
-                {
-                    list[i] = interleaved[i];
-                }
+                for (int k = 0; k < count; k++)
+                    list[k] = interleaved[k];
             }
+
 
 
 
@@ -246,12 +254,18 @@ namespace RTCV.CorruptCore
                     break;
                 case interleave:
                     Interleave(byteArr);
+
                     break;
+
                 case rand:
                 default:
                     ShuffleRandom(byteArr);
                     break;
+
+
             }
+
+
 
             if (OutputMultipleUnits)
             {
